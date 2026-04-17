@@ -1,0 +1,93 @@
+#include <LiquidCrystal.h>
+
+// Inicializa o display LCD com os pinos conectados
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+// Definição dos pinos
+int sensorLuz = A0;      // Sensor de luz (LDR)
+int ledVerde = 6;        // LED verde (nível OK)
+int ledAmarelo = 7;      // LED amarelo (nível de alerta)
+int ledVermelho = 8;     // LED vermelho (nível crítico)
+int buzzer = 9;          // Buzzer para alerta sonoro
+
+// Variáveis de leitura
+int valorLuz = 0;        // Valor bruto do sensor (0–1023)
+int intensidade = 0;     // Valor convertido em porcentagem (0–100%)
+
+void setup() {
+  // Inicializa o LCD com 16 colunas e 2 linhas
+  lcd.begin(16, 2);
+
+  // Configura os pinos
+  pinMode(sensorLuz, INPUT);
+  pinMode(ledVerde, OUTPUT);
+  pinMode(ledAmarelo, OUTPUT);
+  pinMode(ledVermelho, OUTPUT);
+  pinMode(buzzer, OUTPUT);
+
+  // Mensagem inicial no display
+  lcd.setCursor(0, 0);
+  lcd.print("Teste");
+  lcd.setCursor(0, 1);
+  lcd.print("Bem-vindo!");
+  delay(3000); // Aguarda 3 segundos
+}
+
+void loop() {
+
+  // Lê o valor do sensor de luz
+  valorLuz = analogRead(sensorLuz);
+
+  // Converte o valor para porcentagem
+  intensidade = map(valorLuz, 0, 1023, 0, 100);
+
+  // Atualiza o display
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Luz: ");
+  lcd.print(intensidade);
+  lcd.print("%");
+
+  lcd.setCursor(0, 1);
+
+  // Condição: Baixa luminosidade (até 30%)
+  if (intensidade <= 30) {
+   
+    lcd.print("Ambiente OK");
+
+    digitalWrite(ledVerde, HIGH);
+    digitalWrite(ledAmarelo, LOW);
+    digitalWrite(ledVermelho, LOW);
+    noTone(buzzer); // Sem som
+  }
+
+  // Condição: Luminosidade média (31% a 70%)
+  else if (intensidade <= 70) {
+ 
+    lcd.print("Nivel ALERTA");
+
+    digitalWrite(ledVerde, LOW);
+    digitalWrite(ledAmarelo, HIGH);
+    digitalWrite(ledVermelho, LOW);
+
+    // Emite som de alerta intermitente
+    tone(buzzer, 1000);
+    delay(3000);
+    noTone(buzzer);
+  }
+
+  // Condição: Alta luminosidade (acima de 70%)
+  else {
+ 
+    lcd.print("MUITA LUZ!");
+
+    digitalWrite(ledVerde, LOW);
+    digitalWrite(ledAmarelo, LOW);
+    digitalWrite(ledVermelho, HIGH);
+
+    // Emite som contínuo mais agudo
+    tone(buzzer, 2000);
+  }
+
+  // Pequeno delay antes da próxima leitura
+  delay(500);
