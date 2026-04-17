@@ -27,7 +27,7 @@ void setup() {
 
   // Mensagem inicial no display
   lcd.setCursor(0, 0);
-  lcd.print("Teste");
+  lcd.print("Vinheria Agnello");
   lcd.setCursor(0, 1);
   lcd.print("Bem-vindo!");
   delay(3000); // Aguarda 3 segundos
